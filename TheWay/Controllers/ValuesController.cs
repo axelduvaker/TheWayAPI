@@ -11,39 +11,14 @@ namespace TheWay.Controllers
     [Route("api/[controller]")]
     public class ValuesController : Controller
     {
-        // GET api/values YOLO
-        [HttpGet]
-        public IEnumerable<string> Get()
+        // GET api/values/word
+        [HttpGet("{word}")]
+        public string Get(string word)
         {
-            return new string[] { "value1", "value2" };
-        }
-
-        // GET api/values/url
-        [HttpGet("({url}")]
-        public string Get(string url)
-        {
-            string sourceCode = WebScraperLogic.getSourceCode(url);
-            Debug.WriteLine(url);
-            Debug.WriteLine(sourceCode);
-            return sourceCode;
-        }
-
-        // POST api/values
-        [HttpPost]
-        public void Post([FromBody]string value)
-        {
-        }
-
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            string uri = "https://www.aftonbladet.se/";
+            string sourceCode = WebScraperLogic.getSourceCode(uri);
+            int count = WebScraperLogic.countWord(sourceCode, word);
+            return "Ordet " + word + " förekommer " + count + " gånger på Aftonbladet";
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace TheWay.Logic
@@ -18,6 +19,18 @@ namespace TheWay.Logic
             sr.Close();
             resp.Close();
             return sourceCode;
+        }
+
+        public static int countWord(string sourceCode, string word)
+        {
+            int count = 0;
+
+            foreach(Match match in Regex.Matches(sourceCode, word))
+            {
+                count++;
+            }
+
+            return count;
         }
     }
 }
