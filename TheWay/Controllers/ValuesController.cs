@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using TheWay.Logic;
+using System.Diagnostics;
 
 namespace TheWay.Controllers
 {
@@ -16,11 +18,14 @@ namespace TheWay.Controllers
             return new string[] { "value1", "value2" };
         }
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        // GET api/values/url
+        [HttpGet("({url}")]
+        public string Get(string url)
         {
-            return "value";
+            string sourceCode = WebScraperLogic.getSourceCode(url);
+            Debug.WriteLine(url);
+            Debug.WriteLine(sourceCode);
+            return sourceCode;
         }
 
         // POST api/values
