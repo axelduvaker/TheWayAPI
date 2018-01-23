@@ -11,9 +11,9 @@ namespace TheWay.Controllers
     [Route("api/[controller]")]
     public class ValuesController : Controller
     {
-        // GET api/values/word
-        [HttpGet("{word}")]
-        public string Get(string word)
+        // GET api/values/word/aftonbladet
+        [HttpGet("aftonbladet/{word}")]
+        public string GetWordCountOnAftonbladet(string word)
         {
             string uri = "https://www.aftonbladet.se/";
             string sourceCode = WebScraperLogic.getSourceCode(uri);
