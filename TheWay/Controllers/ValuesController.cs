@@ -9,7 +9,7 @@ namespace TheWay.Controllers
     [Route("api/[controller]")]
     public class ValuesController : Controller
     {
-        // GET api/values
+        // GET api/values YOLO
         [HttpGet]
         public IEnumerable<string> Get()
         {
