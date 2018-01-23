@@ -12,7 +12,10 @@ namespace TheWay.Logic
     {
         public static string getSourceCode(string url)
         {
-            HttpWebRequest req = (HttpWebRequest)WebRequest.Create(url);
+
+            string http = "https://www." + url;
+
+            HttpWebRequest req = (HttpWebRequest)WebRequest.Create(http);
             HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
             StreamReader sr = new StreamReader(resp.GetResponseStream());
             string sourceCode = sr.ReadToEnd();
@@ -25,7 +28,10 @@ namespace TheWay.Logic
         {
             int count = 0;
 
-            foreach(Match match in Regex.Matches(sourceCode, word))
+            //string webpage = sourceCode.ToLower();
+            //string words = word.ToLower();
+
+            foreach (Match match in Regex.Matches(sourceCode, word))
             {
                 count++;
             }

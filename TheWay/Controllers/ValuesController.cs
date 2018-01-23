@@ -11,14 +11,14 @@ namespace TheWay.Controllers
     [Route("api/[controller]")]
     public class ValuesController : Controller
     {
+
         // GET api/values/word/aftonbladet
-        [HttpGet("aftonbladet/{word}")]
-        public string GetWordCountOnAftonbladet(string word)
+        [HttpGet("{url}/{word}")]
+        public string WordCountOnAftonbladet(string url, string word)
         {
-            string uri = "https://www.aftonbladet.se/";
-            string sourceCode = WebScraperLogic.getSourceCode(uri);
+            string sourceCode = WebScraperLogic.getSourceCode(url);
             int count = WebScraperLogic.countWord(sourceCode, word);
-            return "Ordet " + word + " förekommer " + count + " gånger på Aftonbladet";
+            return "Ordet " + word + " förekommer " + count + " gånger på " + url;
         }
     }
 }
