@@ -14,12 +14,15 @@ namespace TheWay.Controllers
     {
 
         // GET api/values/word/page
-        [HttpGet("{url}/{word}")]
-        public string WordCountOnPage(string url, string word)
+        
+        [HttpGet("{url}/{word}/{interval}")]
+        public string WordCountOnPageAsync(string url, string word, int interval)
         {
             string validUrl = WebScraperLogic.UrlHttpFix(url);
             if (WebScraperLogic.CheckURLValid(validUrl))
             {
+                //anropar intervallanropen i "bakgrunden"
+                WebScraperLogic.CheckPageWithIntervalAsync(url, word, interval);
                 string sourceCode = WebScraperLogic.getSourceCode(validUrl);
                 int count = WebScraperLogic.countWord(sourceCode, word);
                 return "Söksträngen: '" + word + "' förekommer " + count + " gånger på " + url;

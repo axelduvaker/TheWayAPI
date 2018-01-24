@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TheWay.Logic
@@ -22,6 +24,7 @@ namespace TheWay.Logic
             return sourceCode;
 
         }
+
         public static string UrlHttpFix(string url)
         {
             try
@@ -84,6 +87,26 @@ namespace TheWay.Logic
             }
 
             return count;
+        }
+
+
+        //metoden tar in urlen (färdigfixad), söksträngen och sedan intervallen i SEKUNDER
+        public static async Task CheckPageWithIntervalAsync(string url, string word, int interval)
+        {
+            while (true)
+            {
+                Debug.WriteLine(WordCountOnPage(url, word));
+                // intervallerna konverteras till millisekunder för delayen
+                int intervalInMs = interval * 1000;
+                await Task.Delay(intervalInMs);
+            }
+        }
+
+        private static string WordCountOnPage(string url, string word)
+        {
+                string sourceCode = WebScraperLogic.getSourceCode(url);
+                int count = WebScraperLogic.countWord(sourceCode, word);
+                return count.ToString();
         }
     }
 }
