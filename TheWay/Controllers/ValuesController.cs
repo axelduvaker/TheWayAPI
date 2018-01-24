@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,6 +13,11 @@ namespace TheWay.Controllers
     [Route("api/[controller]")]
     public class ValuesController : Controller
     {
+        public IActionResult Index()
+        {
+            var file = ApplicationSettings.env.ContentRootPath + $"{Path.DirectorySeparatorChar}wwwroot{Path.DirectorySeparatorChar}index.html";
+            return PhysicalFile(file, "text/html");
+        }
 
         // GET api/values/word/page
         [HttpGet("{url}/{word}")]
