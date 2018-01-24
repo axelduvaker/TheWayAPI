@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TheWay.Logic;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace TheWay.Controllers
 {
@@ -12,13 +13,21 @@ namespace TheWay.Controllers
     public class ValuesController : Controller
     {
 
-        // GET api/values/word/aftonbladet
+        // GET api/values/word/page
         [HttpGet("{url}/{word}")]
-        public string WordCountOnAftonbladet(string url, string word)
+        public string WordCountOnPage(string url, string word)
         {
-            string sourceCode = WebScraperLogic.getSourceCode(url);
-            int count = WebScraperLogic.countWord(sourceCode, word);
-            return "Ordet " + word + " förekommer " + count + " gånger på " + url;
+            string validUrl = WebScraperLogic.UrlHttpFix(url);
+            if (WebScraperLogic.CheckURLValid(validUrl))
+            {
+                string sourceCode = WebScraperLogic.getSourceCode(validUrl);
+                int count = WebScraperLogic.countWord(sourceCode, word);
+                return "Söksträngen: '" + word + "' förekommer " + count + " gånger på " + url;
+            }
+            else
+            {
+                return "Urlen: '" + url + "' är felaktig, försök igen med ex: aftonbladet.se eller www.google.com";
+            }
         }
     }
 }
