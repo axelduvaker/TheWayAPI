@@ -33,7 +33,12 @@ namespace TheWay.Controllers
                 WebScraperLogic.CheckPageWithIntervalAsync(validUrl, word, interval);
                 string sourceCode = WebScraperLogic.getSourceCode(validUrl);
                 int count = WebScraperLogic.countWord(sourceCode, word);
-                return "Söksträngen: '" + word + "' förekommer " + count + " gånger på " + url;
+                if(count != null) {
+                    return "Söksträngen: '" + word + "' förekommer " + count + " gånger på " + validUrl;
+                }
+                else {
+                    return validUrl + " verkar inte finnas, eller så är sidan nere!";
+                }
             }
             else
             {

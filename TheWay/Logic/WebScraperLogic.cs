@@ -33,12 +33,20 @@ namespace TheWay.Logic
         public static string getSourceCode(string url)
         {
             HttpWebRequest req = (HttpWebRequest)WebRequest.Create(url);
-            HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
-            StreamReader sr = new StreamReader(resp.GetResponseStream());
-            string sourceCode = sr.ReadToEnd();
-            sr.Close();
-            resp.Close();
-            return sourceCode;
+            try
+            {
+                HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
+                StreamReader sr = new StreamReader(resp.GetResponseStream());
+                string sourceCode = sr.ReadToEnd();
+                sr.Close();
+                resp.Close();
+                return sourceCode;
+            }
+            catch
+            {
+                return null;
+            }
+            
         }
         public static bool IsThePageAlive(string url)
         {
@@ -107,13 +115,17 @@ namespace TheWay.Logic
 
         public static bool CheckURLValid(this string source)
         {
-            foreach (string domain in domains)
+            if (!source.Contains(".."))
             {
-                if (source.EndsWith(domain))
+                foreach (string domain in domains)
                 {
-                    return true;
-                }
+                    if (source.EndsWith(domain))
+                    {
+                        return true;
+                    }
 
+                }
+                return false;
             }
             return false;
 
@@ -174,8 +186,16 @@ namespace TheWay.Logic
         private static string WordCountOnPage(string url, string word)
         {
             string sourceCode = WebScraperLogic.getSourceCode(url);
-            int count = WebScraperLogic.countWord(sourceCode, word);
-            return count.ToString();
+            if(sourceCode != null)
+            {
+                int count = WebScraperLogic.countWord(sourceCode, word);
+                return count.ToString();
+            }
+            else
+            {
+                return null;
+            }
+
         }
 
         class MyClient : WebClient
