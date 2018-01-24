@@ -12,9 +12,26 @@ namespace TheWay.Logic
 {
     public static class WebScraperLogic
     {
+        public static List<string> domains = new List<string>();
+        public static void FillList()
+        {
+            domains.Add(".com");
+            domains.Add(".se");
+            domains.Add(".nu");
+            domains.Add(".co.uk");
+            domains.Add(".org");
+            domains.Add(".biz");
+            domains.Add(".edu");
+            domains.Add(".gov");
+            domains.Add(".net");
+            domains.Add(".eu");
+            domains.Add(".ca");
+            domains.Add(".de");
+            domains.Add(".info");
+            domains.Add(".us");
+        }
         public static string getSourceCode(string url)
         {
-
             HttpWebRequest req = (HttpWebRequest)WebRequest.Create(url);
             HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
             StreamReader sr = new StreamReader(resp.GetResponseStream());
@@ -22,7 +39,33 @@ namespace TheWay.Logic
             sr.Close();
             resp.Close();
             return sourceCode;
-
+        }
+        public static bool IsThePageAlive(string url)
+        {
+            Uri uri = new Uri(url);
+            WebRequest request = WebRequest.Create(uri);
+            request.Method = "HEAD";
+            try
+            {
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                if (response == null || response.StatusCode != HttpStatusCode.OK)
+                {
+                    return false;
+                    Debug.WriteLine("The page: '" + url + "' is down");
+                }
+                else
+                {
+                    return true;
+                    Debug.WriteLine("The page: '" + url + "' is up!");
+                }
+                response.Close();
+            }
+            catch
+            {
+                return false;
+                Debug.WriteLine("The page: '" + url + "' is down or doesn't exist!");
+            }
+            
         }
 
         public static string UrlHttpFix(string url)
@@ -44,7 +87,7 @@ namespace TheWay.Logic
                     }
                     else
                     {
-                        string newUrl = "http://www." + url;
+                        string newUrl = "http://" + url;
                         return newUrl;
 
                     }
@@ -61,18 +104,27 @@ namespace TheWay.Logic
 
         }
 
+
         public static bool CheckURLValid(this string source)
         {
-
-
-            if (source.Split('.').Length >= 3)
+            foreach (string domain in domains)
             {
-                return true;
+                if (source.EndsWith(domain))
+                {
+                    return true;
+                }
+
             }
-            else
-            {
-                return false;
-            }
+            return false;
+
+            //if (source.Split('.').Length >= 3)
+            //{
+            //    return true;
+            //}
+            //else
+            //{
+            //    return false;
+            //}
         }
         public static int countWord(string sourceCode, string word)
         {
@@ -101,12 +153,44 @@ namespace TheWay.Logic
                 await Task.Delay(intervalInMs);
             }
         }
+        public static async Task CheckPageWithIntervalAsync(string url, int interval)
+        {
+            while (true)
+            {
+                if (IsThePageAlive(url))
+                {
+                    Debug.WriteLine(url + " is OK");
+                }
+                else
+                {
+                    Debug.WriteLine(url + " is DEAD");
+                }
+                // intervallerna konverteras till millisekunder för delayen
+                int intervalInMs = interval * 1000;
+                await Task.Delay(intervalInMs);
+            }
+        }
 
         private static string WordCountOnPage(string url, string word)
         {
-                string sourceCode = WebScraperLogic.getSourceCode(url);
-                int count = WebScraperLogic.countWord(sourceCode, word);
-                return count.ToString();
+            string sourceCode = WebScraperLogic.getSourceCode(url);
+            int count = WebScraperLogic.countWord(sourceCode, word);
+            return count.ToString();
+        }
+
+        class MyClient : WebClient
+        {
+            public bool HeadOnly { get; set; }
+            protected override WebRequest GetWebRequest(Uri address)
+            {
+                WebRequest req = base.GetWebRequest(address);
+                if (HeadOnly && req.Method == "GET")
+                {
+                    req.Method = "HEAD";
+                }
+                return req;
+            }
         }
     }
 }
+
