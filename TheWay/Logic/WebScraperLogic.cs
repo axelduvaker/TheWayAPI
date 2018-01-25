@@ -102,7 +102,6 @@ namespace TheWay.Logic
                         return newUrl;
                     }
                 }
-
             }
             catch (Exception e)
             {
@@ -125,15 +124,6 @@ namespace TheWay.Logic
                 return false;
             }
             return false;
-
-            //if (source.Split('.').Length >= 3)
-            //{
-            //    return true;
-            //}
-            //else
-            //{
-            //    return false;
-            //}
         }
 
         //metoden tar in urlen (färdigfixad), söksträngen och sedan intervallen i SEKUNDER

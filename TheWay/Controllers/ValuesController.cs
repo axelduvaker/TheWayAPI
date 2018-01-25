@@ -8,6 +8,7 @@ using TheWay.Logic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Net;
+using System.Web.Http.Cors;
 
 namespace TheWay.Controllers
 {
