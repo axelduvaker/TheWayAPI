@@ -135,14 +135,11 @@ namespace TheWay.Logic
             while (true)
             {
                 Debug.WriteLine(WordCountOnPage(url, word));
-
-
-
                 PrintToLog(url, word);
-
                 await Task.Delay(intervalInMs);
             }
         }
+
         public static async Task CheckPageWithIntervalAsync(string url, int interval)
         {
             while (true)
@@ -187,20 +184,6 @@ namespace TheWay.Logic
             using (StreamWriter writer = new StreamWriter("logFile.txt", true))
             {
                 writer.WriteLine(timeStamp + " - Söksträngen: '" + word + "' förekommer " + count + " gånger på " + url);
-            }
-        }
-
-        class MyClient : WebClient
-        {
-            public bool HeadOnly { get; set; }
-            protected override WebRequest GetWebRequest(Uri address)
-            {
-                WebRequest req = base.GetWebRequest(address);
-                if (HeadOnly && req.Method == "GET")
-                {
-                    req.Method = "HEAD";
-                }
-                return req;
             }
         }
     }
