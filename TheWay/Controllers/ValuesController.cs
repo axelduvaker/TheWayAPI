@@ -21,7 +21,6 @@ namespace TheWay.Controllers
         }
 
         // GET api/values/word/page
-
         [HttpGet("{url}/{word}/{interval}")]
         public string WordCountOnPageAsync(string url, string word, int interval)
         {
@@ -31,8 +30,9 @@ namespace TheWay.Controllers
             {
                 //anropar intervallanropen i "bakgrunden"
                 WebScraperLogic.CheckPageWithIntervalAsync(validUrl, word, interval);
-                string sourceCode = WebScraperLogic.getSourceCode(validUrl);
-                int count = WebScraperLogic.countWord(sourceCode, word);
+                string sourceCode = WebScraperLogic.GetSourceCode(validUrl);
+                string count = WebScraperLogic.WordCountOnPage(validUrl, word);
+
                 if(count != null) {
                     return "Söksträngen: '" + word + "' förekommer " + count + " gånger på " + validUrl;
                 }

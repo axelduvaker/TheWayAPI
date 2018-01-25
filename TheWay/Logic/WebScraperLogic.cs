@@ -30,7 +30,7 @@ namespace TheWay.Logic
             domains.Add(".info");
             domains.Add(".us");
         }
-        public static string getSourceCode(string url)
+        public static string GetSourceCode(string url)
         {
             HttpWebRequest req = (HttpWebRequest)WebRequest.Create(url);
             try
@@ -46,34 +46,37 @@ namespace TheWay.Logic
             {
                 return null;
             }
-            
         }
+
         public static bool IsThePageAlive(string url)
         {
+            bool returnVal;
             Uri uri = new Uri(url);
             WebRequest request = WebRequest.Create(uri);
             request.Method = "HEAD";
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+
             try
             {
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
                 if (response == null || response.StatusCode != HttpStatusCode.OK)
                 {
-                    return false;
                     Debug.WriteLine("The page: '" + url + "' is down");
+                    returnVal = false;
                 }
                 else
                 {
-                    return true;
                     Debug.WriteLine("The page: '" + url + "' is up!");
+                    returnVal = true;
                 }
-                response.Close();
             }
             catch
             {
-                return false;
                 Debug.WriteLine("The page: '" + url + "' is down or doesn't exist!");
+                returnVal = false;
             }
-            
+
+            response.Close();
+            return returnVal;
         }
 
         public static string UrlHttpFix(string url)
@@ -97,10 +100,8 @@ namespace TheWay.Logic
                     {
                         string newUrl = "http://" + url;
                         return newUrl;
-
                     }
                 }
-
 
             }
             catch (Exception e)
@@ -108,10 +109,7 @@ namespace TheWay.Logic
                 Console.WriteLine(e.Message);
                 return null;
             }
-
-
         }
-
 
         public static bool CheckURLValid(this string source)
         {
@@ -123,7 +121,6 @@ namespace TheWay.Logic
                     {
                         return true;
                     }
-
                 }
                 return false;
             }
@@ -138,30 +135,21 @@ namespace TheWay.Logic
             //    return false;
             //}
         }
-        public static int countWord(string sourceCode, string word)
-        {
-            int count = 0;
-
-            //string webpage = sourceCode.ToLower();
-            //string words = word.ToLower();
-
-            foreach (Match match in Regex.Matches(sourceCode, word, RegexOptions.IgnoreCase))
-            {
-                count++;
-            }
-
-            return count;
-        }
-
 
         //metoden tar in urlen (färdigfixad), söksträngen och sedan intervallen i SEKUNDER
         public static async Task CheckPageWithIntervalAsync(string url, string word, int interval)
         {
+            // intervallerna konverteras till millisekunder för delayen
+            int intervalInMs = interval * 1000;
+
             while (true)
             {
                 Debug.WriteLine(WordCountOnPage(url, word));
-                // intervallerna konverteras till millisekunder för delayen
-                int intervalInMs = interval * 1000;
+
+
+
+                PrintToLog(url, word);
+
                 await Task.Delay(intervalInMs);
             }
         }
@@ -183,19 +171,33 @@ namespace TheWay.Logic
             }
         }
 
-        private static string WordCountOnPage(string url, string word)
+        public static string WordCountOnPage(string url, string word)
         {
-            string sourceCode = WebScraperLogic.getSourceCode(url);
+            int count = 0;
+            string sourceCode = WebScraperLogic.GetSourceCode(url);
             if(sourceCode != null)
             {
-                int count = WebScraperLogic.countWord(sourceCode, word);
+                foreach (Match match in Regex.Matches(sourceCode, word, RegexOptions.IgnoreCase))
+                {
+                    count++;
+                }
                 return count.ToString();
             }
             else
             {
                 return null;
             }
+        }
 
+        public static void PrintToLog(string url, string word) 
+        {
+            string count = WordCountOnPage(url, word);
+            String timeStamp = DateTime.Now.ToString();
+
+            using (StreamWriter writer = new StreamWriter("logFile.txt", true))
+            {
+                writer.WriteLine(timeStamp + " - Söksträngen: '" + word + "' förekommer " + count + " gånger på " + url);
+            }
         }
 
         class MyClient : WebClient
