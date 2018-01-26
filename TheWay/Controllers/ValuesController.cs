@@ -5,10 +5,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TheWay.Logic;
+using TheWay.Repository;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Net;
 using System.Web.Http.Cors;
+using Newtonsoft.Json;
 
 namespace TheWay.Controllers
 {
@@ -34,8 +36,15 @@ namespace TheWay.Controllers
                 string sourceCode = WebScraperLogic.GetSourceCode(validUrl);
                 string count = WebScraperLogic.WordCountOnPage(validUrl, word);
 
-                if(count != null) {
-                    return "Söksträngen: '" + word + "' förekommer " + count + " gånger på " + validUrl;
+                ValuesDto valuesdto = new ValuesDto();
+                valuesdto.Url = validUrl;
+                valuesdto.Word = word;
+                valuesdto.Count = count;
+
+                string json = JsonConvert.SerializeObject(valuesdto);
+
+                if (count != null) {
+                    return json;
                 }
                 else {
                     return validUrl + " verkar inte finnas, eller så är sidan nere!";
@@ -46,6 +55,7 @@ namespace TheWay.Controllers
                 return "Urlen: '" + url + "' är felaktig, försök igen med ex: aftonbladet.se eller www.google.com";
             }
         }
+
         [HttpGet("health/{url}/{interval}")]
         public string PageHealthAnalysisAsync(string url, int interval)
         {
