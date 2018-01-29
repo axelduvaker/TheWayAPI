@@ -13,6 +13,7 @@ namespace TheWay.Logic
     public static class WebScraperLogic
     {
         public static List<string> domains = new List<string>();
+        public static List<string> queueList = new List<string>();
         public static void FillList()
         {
             domains.Add(".com");
@@ -30,7 +31,45 @@ namespace TheWay.Logic
             domains.Add(".info");
             domains.Add(".us");
         }
-        public static string GetSourceCode(string url)
+
+        private static void addToQueue(string url)
+        {
+            //lägger till urlen till en kö
+            //Det borde egentligen vara ett unikt ID, så man kan köra flera kontroller på samma sida
+            if (!queueList.Contains(url))
+            {
+                queueList.Add(url);
+            }
+            else
+            {
+                Console.WriteLine(url + " Fanns redan i kön");
+            }
+            
+        }
+        private static bool queueStatus(string url)
+        {
+            //kollar om urlen är först i kön
+            if (url.Equals(queueList.First(), StringComparison.InvariantCultureIgnoreCase))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        private static void removeFromQueue(string url)
+        {
+            if(queueList.First().Equals(url, StringComparison.InvariantCultureIgnoreCase))
+            {
+                Console.WriteLine(url+" Är nu borttagen från kön!");
+                queueList.Remove(url);
+                if(queueList.Count > 0)
+                    Console.WriteLine("Först i kön är nu: "+queueList.First());
+            }
+        }
+
+            public static string GetSourceCode(string url)
         {
             HttpWebRequest req = (HttpWebRequest)WebRequest.Create(url);
             try
@@ -60,18 +99,18 @@ namespace TheWay.Logic
             {
                 if (response == null || response.StatusCode != HttpStatusCode.OK)
                 {
-                    Debug.WriteLine("The page: '" + url + "' is down");
+                    Console.WriteLine("The page: '" + url + "' is down");
                     returnVal = false;
                 }
                 else
                 {
-                    Debug.WriteLine("The page: '" + url + "' is up!");
+                    Console.WriteLine("The page: '" + url + "' is up!");
                     returnVal = true;
                 }
             }
             catch
             {
-                Debug.WriteLine("The page: '" + url + "' is down or doesn't exist!");
+                Console.WriteLine("The page: '" + url + "' is down or doesn't exist!");
                 returnVal = false;
             }
 
@@ -131,12 +170,28 @@ namespace TheWay.Logic
         {
             // intervallerna konverteras till millisekunder för delayen
             int intervalInMs = interval * 1000;
-
+            addToQueue(url);
             while (true)
             {
-                Debug.WriteLine(WordCountOnPage(url, word));
-                PrintToLog(url, word);
-                await Task.Delay(intervalInMs);
+                
+                if (queueStatus(url))
+                {
+                    Console.WriteLine(WordCountOnPage(url, word));
+                    PrintToLog(url, word);
+                    removeFromQueue(url);
+
+                    await Task.Delay(intervalInMs);
+
+                    addToQueue(url);
+
+                    Console.WriteLine(url + " har lagts till sist i kön");
+                }
+                else
+                {
+                    Console.WriteLine("väntar 2 sekund, kön är upptagen!");
+                    await Task.Delay(2000);
+                }
+               
             }
         }
 
@@ -146,11 +201,11 @@ namespace TheWay.Logic
             {
                 if (IsThePageAlive(url))
                 {
-                    Debug.WriteLine(url + " is OK");
+                    Console.WriteLine(url + " is OK");
                 }
                 else
                 {
-                    Debug.WriteLine(url + " is DEAD");
+                    Console.WriteLine(url + " is DEAD");
                 }
                 // intervallerna konverteras till millisekunder för delayen
                 int intervalInMs = interval * 1000;
@@ -162,7 +217,7 @@ namespace TheWay.Logic
         {
             int count = 0;
             string sourceCode = WebScraperLogic.GetSourceCode(url);
-            if(sourceCode != null)
+            if (sourceCode != null)
             {
                 foreach (Match match in Regex.Matches(sourceCode, word, RegexOptions.IgnoreCase))
                 {
@@ -176,7 +231,7 @@ namespace TheWay.Logic
             }
         }
 
-        public static void PrintToLog(string url, string word) 
+        public static void PrintToLog(string url, string word)
         {
             string count = WordCountOnPage(url, word);
             String timeStamp = DateTime.Now.ToString();
