@@ -37,17 +37,22 @@ namespace TheWay.Controllers
                 string count = WebScraperLogic.WordCountOnPage(validUrl, word);
 
                 ValuesDto valuesdto = new ValuesDto();
-                valuesdto.Url = validUrl;
-                valuesdto.Word = word;
-                valuesdto.Count = count;
-
-                string json = JsonConvert.SerializeObject(valuesdto);
 
                 if (count != null) {
+                    valuesdto.Url = validUrl;
+                    valuesdto.Word = word;
+                    valuesdto.Count = count;
+
+                    string json = JsonConvert.SerializeObject(valuesdto);
                     return json;
                 }
                 else {
-                    return validUrl + " verkar inte finnas, eller så är sidan nere!";
+                    valuesdto.Url = validUrl + " verkar inte finnas, eller så är sidan nere!";
+                    valuesdto.Word = null;
+                    valuesdto.Count = null;
+
+                    string json = JsonConvert.SerializeObject(valuesdto);
+                    return json;
                 }
             }
             else
